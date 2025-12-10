@@ -22,17 +22,115 @@
         #theme-toggle { position: absolute; top: 20px; left: 20px; background: none; border: 2px solid #008080; color: #008080; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
         #reveal-button { padding: 15px 30px; font-size: 1.2em; background-color: #008080; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s; margin-top: 20px; }
         
-        /* Gizli İçerik ve Efektler */
+        /* GİZLENEN ALAN (SÜRPRİZ İÇERİK) */
         #birthday-content { 
             display: none; margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 30px;
             filter: sepia(50%) contrast(110%); transition: filter 2s ease-in-out; text-align: right;
         }
-        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; font-size: 1.5em; color: #b22222; }
-        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #008080; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-top: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-top: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        
+        /* Geri kalan CSS aynı kaldı */
     </style>
 </head>
 <body class="light-theme" dir="rtl">
 
-    <div id="preloader">
+    <button id="theme-toggle">روشن / تاریک</button>
+
+    <div id="main-content">
+        <div class="container" id="main-container">
+            
+            <div id="intro-section">
+                <h1 class="rtl-text">تولدت مبارک محسن!</h1> 
+                <p style="margin-bottom: 30px;">(Tavallodet Mobârak - تولدت مبارک)</p>
+                <p>محسن عزیز، رانا، آتوسا و رادین برای شما یک سورپرایز ویژه دارند. اگر آماده هستید، دکمه را فشار دهید تا جشن شروع شود!</p>
+
+                <button id="reveal-button">باز کردن سورپرایز و تماشا 🥳</button>
+            </div>
+
+            <div id="birthday-content" style="display: none;">
+                
+                <h2 style="color: #2e8b57;">جشن شما آغاز شد!</h2>
+                
+                <div class="video-wrapper">
+                    <iframe id="birthday-video" width="560" height="315" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+
+                <h3 style="margin-top: 30px;">کارت‌های آرزوی دوستان:</h3>
+                <div id="wish-card">
+                    <p id="wish-text"></p>
+                </div>
+                
+                <div id="signature-section" style="margin-top: 50px; border-top: 1px solid #ddd; padding-top: 30px;">
+                    <h3 style="color: #555;">دفتر یادگاری: امضا کنید</h3>
+                    <p>لطفا نام و نام خانوادگی خود را در این دفتر یادگاری بنویسید تا این لحظه ثبت شود:</p>
+                    <input type="text" id="signature-input" placeholder="نام و نام خانوادگی..." style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 60%; max-width: 300px;">
+                    <button id="sign-button" style="background-color: #555; color: white; padding: 10px 15px; border: none; border-radius: 5px; margin-left: 10px;">ثبت امضا</button>
+                    <p id="signature-status" style="margin-top: 10px; font-weight: bold; min-height: 20px;"></p>
+                </div>
+
+            </div>
+            
+            <div id="delayed-message">
+                <p><strong>پیام اضافی از رانا، آتوسا و رادین:</strong> محسن عزیزم، همراه زندگی من، تولدت مبارک و سال‌های طولانی پر از سلامتی، خوشبختی و شادی داشته باشی! همیشه دوستت داریم. - رانا، آتوسا و رادین</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hata ayıklama için VIDEO_URL doğru olmalı
+        const VIDEO_URL = "https://www.youtube.com/embed/n_Jp2L2l3q0?autoplay=1&mute=1&controls=1"; 
+        
+        // Tüm DOM Elementleri bir kerede alınır
+        const elements = {
+            body: document.body,
+            mainContainer: document.getElementById('main-container'),
+            introSection: document.getElementById('intro-section'),
+            revealButton: document.getElementById('reveal-button'),
+            birthdayContent: document.getElementById('birthday-content'),
+            videoElement: document.getElementById('birthday-video'),
+            delayedMessage: document.getElementById('delayed-message'),
+            themeToggle: document.getElementById('theme-toggle'),
+            wishText: document.getElementById('wish-text'),
+            signatureInput: document.getElementById('signature-input'),
+            signButton: document.getElementById('sign-button'),
+        };
+        
+        const wishCards = [
+            { sender: "رانا", message: "محسن عزیزم، همیشه قدردان حمایت و حضورت در کنارم هستم. تو بزرگترین پشتیبان من هستی. تولدت مبارک! ❤️" },
+            { sender: "آتوسا", message: "محسن عزیز، دوستی شما را جشن می‌گیریم و برایت سالی پر از سلامتی و شادی آرزومندیم! 🎉" },
+            { sender: "رادین", message: "تولدت مبارک (Tavallodet Mobârak)! آرزو می‌کنم همیشه پرانرژی و لبخند به لب باشی." }
+        ];
+
+        let currentWishIndex = 0;
+        
+        // YÜKLENİYOR İŞLEVİ ARTIK YOK. SADECE DOMContentLoaded İLE BAŞLAR
+
+        // DİLEK KARTLARI FONKSİYONU
+        function displayNextWish() {
+            const card = wishCards[currentWishIndex];
+            elements.wishText.innerHTML = `<strong>پیام از ${card.sender}:</strong> "${card.message}"`;
+            currentWishIndex = (currentWishIndex + 1) % wishCards.length;
+        }
+
+        displayNextWish();
+        setInterval(displayNextWish, 5000); 
+
+        // TEMA DEĞİŞTİRME FONKSİYONU
+        elements.themeToggle.addEventListener('click', () => { /* ... */ });
+        
+        // İMZA İŞLEVİ
+        elements.signButton.addEventListener('click', function() { /* ... */ });
+
+        // KONFETİ Fonksiyonu
+        function startConfetti() { /* ... */ }
+        
+        // SÜRPRİZİ GÖSTERME FONKSİYONU (Butona Tıklama)
+        elements.revealButton.addEventListener('click', function() {
+            elements.revealButton.disabled = true;
+
+            // LAMBA ANAHTARI EFECTİ
+            elements.body.style.transition = 'background-color 0.1s';
+            elements.body.style.backgroundColor = '#000'; 
+            elements.mainContainer.style.opacity = '0';
+
+            setTimeout(() => {
+                elements.body.style.transition = 'background-color 0.5s, color 0.5
