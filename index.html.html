@@ -1,0 +1,128 @@
+<script>
+        // Sabitler
+        const VIDEO_URL = "https://www.youtube.com/embed/n_Jp2L2l3q0?autoplay=1&mute=1&controls=1"; 
+        
+        // Dilek Kartları
+        const wishCards = [
+            { sender: "رانا", message: "محسن عزیزم، همیشه قدردان حمایت و حضورت در کنارم هستم. تو بزرگترین پشتیبان من هستی. تولدت مبارک! ❤️" },
+            { sender: "آتوسا", message: "محسن عزیز، دوستی شما را جشن می‌گیریم و برایت سالی پر از سلامتی و شادی آرزومندیم! 🎉" },
+            { sender: "رادین", message: "تولدت مبارک (Tavallodet Mobârak)! آرزو می‌کنم همیشه پرانرژی و لبخند به لب باشی." }
+        ];
+
+        let currentWishIndex = 0;
+        
+        // SADECE DOM TAMAMEN YÜKLENDİKTEN SONRA ÇALIŞMASI GEREKEN KODLAR BURADA!
+        document.addEventListener('DOMContentLoaded', (event) => {
+            
+            // DOM Elementleri tekrar tanımlanıyor
+            const body = document.body;
+            const mainContainer = document.getElementById('main-container');
+            const introSection = document.getElementById('intro-section');
+            const revealButton = document.getElementById('reveal-button');
+            const birthdayContent = document.getElementById('birthday-content');
+            const videoElement = document.getElementById('birthday-video');
+            const delayedMessage = document.getElementById('delayed-message');
+            const themeToggle = document.getElementById('theme-toggle');
+            const wishText = document.getElementById('wish-text');
+            const signatureInput = document.getElementById('signature-input');
+            const signButton = document.getElementById('sign-button');
+            const signatureStatus = document.getElementById('signature-status');
+            const preloader = document.getElementById('preloader');
+            const mainContent = document.getElementById('main-content');
+
+            // --- FONKSİYON TANIMLAMALARI ---
+            
+            // YÜKLENİYOR EKRANI İŞLEVİ (Sayfa yüklendiğinde preloader'ı gizle)
+            window.onload = function() {
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                }, 1500);
+            };
+
+            // DİLEK KARTLARI FONKSİYONU
+            function displayNextWish() {
+                const card = wishCards[currentWishIndex];
+                wishText.innerHTML = `<strong>پیام از ${card.sender}:</strong> "${card.message}"`;
+                currentWishIndex = (currentWishIndex + 1) % wishCards.length;
+            }
+
+            displayNextWish();
+            setInterval(displayNextWish, 5000); 
+
+            // TEMA DEĞİŞTİRME FONKSİYONU
+            themeToggle.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.replace('light-theme', 'dark-theme');
+                    mainContainer.style.setProperty('--card-bg', '#444');
+                    document.querySelectorAll('h1, h2, h3, #theme-toggle').forEach(el => el.style.color = '#fff');
+                } else {
+                    body.classList.replace('dark-theme', 'light-theme');
+                    mainContainer.style.setProperty('--card-bg', '#ffffff');
+                    document.querySelectorAll('h1, h2, h3, #theme-toggle').forEach(el => el.style.color = '');
+                }
+            });
+            
+            // İMZA İŞLEVİ
+            signButton.addEventListener('click', function() {
+                const name = signatureInput.value.trim();
+                if (name) {
+                    signatureStatus.textContent = `ممنون ${name}! این لحظه ثبت شد.`;
+                    signatureStatus.style.color = '#2e8b57';
+                    signButton.disabled = true;
+                    signatureInput.disabled = true;
+                } else {
+                    signatureStatus.textContent = 'لطفاً نام خود را وارد کنید.';
+                    signatureStatus.style.color = '#b22222';
+                }
+            });
+
+            // KONFETİ Fonksiyonu
+            function startConfetti() {
+                const colors = ['#f54291', '#42f5e3', '#42f557', '#f5e342', '#f54242'];
+                const confettiCount = 100;
+
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animationDuration = (Math.random() * 1.5 + 2) + 's'; 
+                    confetti.style.transform = 'translateY(' + (-Math.random() * 50) + 'px)';
+
+                    document.body.appendChild(confetti);
+                    
+                    confetti.addEventListener('animationend', () => confetti.remove());
+                }
+            }
+            
+            // --- BUTON TIKLAMA İŞLEVİ (SÜRPRİZİ GÖSTERME) ---
+            revealButton.addEventListener('click', function() {
+                revealButton.disabled = true;
+
+                // LAMBA ANAHTARI EFECTİ
+                body.style.transition = 'background-color 0.1s';
+                body.style.backgroundColor = '#000'; 
+                mainContainer.style.opacity = '0';
+
+                setTimeout(() => {
+                    body.style.transition = 'background-color 0.5s, color 0.5s'; 
+                    
+                    introSection.style.display = 'none';
+                    birthdayContent.style.display = 'block';
+                    mainContainer.style.opacity = '1';
+
+                    videoElement.src = VIDEO_URL;
+                    startConfetti();
+                    
+                    // Zaman Ayarlı Mesaj
+                    setTimeout(() => {
+                        delayedMessage.style.display = 'block';
+                        delayedMessage.style.opacity = '1';
+                    }, 4000); 
+                }, 500);
+            });
+        }); // DOMContentLoaded sonu
+
+    </script>
